@@ -28,6 +28,8 @@ public class Product {
     private Date dataCadastro;
     private String imagem;
 
+    public Product() {};
+    
     public Product(String codigo, char status, String nome,
             String descricao, int qtdEstoque, int minEstoque, int maxEstoque,
             float precoCompra, float precoVenda, int barCode, int ncm,

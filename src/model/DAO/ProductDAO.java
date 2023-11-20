@@ -4,7 +4,9 @@
  */
 package model.DAO;
 
+import java.util.List;
 import java.sql.*;
+import java.util.ArrayList;
 import model.Product;
 
 /**
@@ -16,6 +18,7 @@ public class ProductDAO {
     private static final String SERVIDOR = "jdbc:mysql://localhost:3306/loja";
     private static final String USUARIO = "root";
     private static final String SENHA = "root";
+    
 
     public static void inserirProduto(Product produto) {
         String sql = "INSERT INTO `loja`.`produto` (cod, status, "
@@ -24,8 +27,7 @@ public class ProductDAO {
                 + "imagem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DriverManager
-                .getConnection(SERVIDOR, USUARIO, SENHA); 
-          PreparedStatement statement = connection.prepareStatement(sql)) {
+                .getConnection(SERVIDOR, USUARIO, SENHA); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, produto.getCodigo());
             statement.setString(2, String.valueOf(produto.getStatus()));
@@ -48,5 +50,40 @@ public class ProductDAO {
         }
 
     }
-    
+
+    public static List<Product> listarProduto() {
+        String sql = "SELECT * FROM `loja`.`produto`";
+        ResultSet result = null;
+        
+        List<Product> produtos = new ArrayList<>();
+        try (Connection connection = DriverManager
+                .getConnection(SERVIDOR, USUARIO, SENHA); PreparedStatement statement = connection.prepareStatement(sql)) {
+            result = statement.executeQuery();
+            
+            while(result.next()) {
+                Product produto = new Product();
+                
+                produto.setId(result.getInt("id"));
+                produto.setCodigo(result.getString("cod"));
+                produto.setStatus(result.getString("status").charAt(0));
+                produto.setDataCadastro(result.getDate("data_cadastro"));
+                produto.setNome(result.getString("nome"));
+                produto.setDescricao(result.getString("descricao"));
+                produto.setQtdEstoque(result.getInt("qtd_estoque"));
+                produto.setMinEstoque(result.getInt("estoque_minimo"));
+                produto.setMaxEstoque(result.getInt("estoque_maximo"));
+                produto.setPrecoCompra(result.getFloat("preco_compra"));
+                produto.setPrecoVenda(result.getFloat("preco_venda"));
+                produto.setFator(result.getFloat("fator"));
+                produto.setNcm(result.getInt("ncm"));
+                produto.setBarCode(result.getInt("bar_code"));
+                produto.setImagem(result.getString("imagem"));
+                produtos.add(produto);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produtos;
+    }
+
 }

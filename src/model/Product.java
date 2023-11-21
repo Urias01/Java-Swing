@@ -22,7 +22,7 @@ public class Product {
     private int maxEstoque;
     private float precoCompra;
     private float precoVenda;
-    private int barCode;
+    private String barCode;
     private int ncm;
     private float fator;
     private Date dataCadastro;
@@ -32,7 +32,7 @@ public class Product {
     
     public Product(String codigo, char status, String nome,
             String descricao, int qtdEstoque, int minEstoque, int maxEstoque,
-            float precoCompra, float precoVenda, int barCode, int ncm,
+            float precoCompra, float precoVenda, String barCode, int ncm,
             float fator, Date dataCadastro, String imagem) {
         this.codigo = codigo;
         this.status = status;
@@ -45,7 +45,7 @@ public class Product {
         this.precoVenda = precoVenda;
         this.barCode = barCode;
         this.ncm = ncm;
-
+        this.fator = fator;
         this.dataCadastro = dataCadastro;
         this.imagem = imagem;
     }
@@ -130,11 +130,11 @@ public class Product {
         this.precoVenda = precoVenda;
     }
 
-    public int getBarCode() {
+    public String getBarCode() {
         return barCode;
     }
 
-    public void setBarCode(int barCode) {
+    public void setBarCode(String barCode) {
         this.barCode = barCode;
     }
 

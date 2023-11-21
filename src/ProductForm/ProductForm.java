@@ -6,9 +6,17 @@ package ProductForm;
 
 import model.DAO.ProductDAO;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.print.PrinterException;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,7 +24,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import model.Product;
@@ -29,7 +37,7 @@ public class ProductForm extends javax.swing.JFrame {
 
     // Instanciar objeto para o fluxo de bytes
     private FileInputStream fis;
-
+    private String base64Image = null;
     //Variavel global para armazenar tamanho da imagem(Bytes)
     private int tamanho;
     // Formatar data
@@ -86,6 +94,8 @@ public class ProductForm extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
+        jButton7 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
@@ -125,12 +135,23 @@ public class ProductForm extends javax.swing.JFrame {
                 jTextField5ActionPerformed(evt);
             }
         });
+        jTextField5.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField5KeyPressed(evt);
+            }
+        });
 
         jLabel8.setText("Estoque máximo");
 
         jLabel9.setText("Preço de compra");
 
         jLabel10.setText("Preço de venda");
+
+        jTextField8.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextField8FocusLost(evt);
+            }
+        });
 
         jLabel11.setText("Fator Lucro");
 
@@ -185,12 +206,31 @@ public class ProductForm extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
+        jTable2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable2MouseClicked(evt);
+            }
+        });
         jScrollPane4.setViewportView(jTable2);
 
         jButton5.setText("Listar");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setText("Imprimir");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
+        jButton7.setText("Atualizar");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
             }
         });
 
@@ -210,7 +250,7 @@ public class ProductForm extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel11)
                                     .addComponent(jLabel9)
@@ -260,7 +300,9 @@ public class ProductForm extends javax.swing.JFrame {
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addGap(66, 66, 66))
         );
         layout.setVerticalGroup(
@@ -281,19 +323,31 @@ public class ProductForm extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(27, 27, 27)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(25, 25, 25)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -325,19 +379,10 @@ public class ProductForm extends javax.swing.JFrame {
                                 .addComponent(jLabel13)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel14)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(157, 157, 157)
-                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jLabel14))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         jLabel1.getAccessibleContext().setAccessibleName("lblCodigo");
@@ -397,11 +442,12 @@ public class ProductForm extends javax.swing.JFrame {
             float precoVenda = Float.parseFloat(jTextField8.getText());
             float fator = Float.parseFloat(jTextField9.getText());
             int NCM = Integer.parseInt(jTextField10.getText());
-            int barCode = Integer.parseInt(jTextField11.getText());
+            String barCode = jTextField11.getText();
 
-            Product produto = new Product(cod, status.charAt(0), nome, descricao, qtdEstoque, estoqueMin, estoqueMax, precoCompra, precoVenda, barCode, NCM, fator, data, "");
+            Product produto = new Product(cod, status.charAt(0), nome, descricao, qtdEstoque, estoqueMin, estoqueMax, precoCompra, precoVenda, barCode, NCM, fator, data, base64Image);
 
             ProductDAO.inserirProduto(produto);
+
         } catch (ParseException ex) {
             Logger.getLogger(ProductForm.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -434,6 +480,66 @@ public class ProductForm extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         this.carregarTabela();
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        MessageFormat header = new MessageFormat("Impressão");
+        MessageFormat footer = new MessageFormat("Página {0, number, integer}");
+        try {
+            jTable2.print(JTable.PrintMode.FIT_WIDTH, header, footer);
+        } catch (PrinterException e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jTable2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable2MouseClicked
+
+        if (jTable2.getSelectedRow() != -1) {
+            jTextField1.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 0).toString());
+            jComboBox1.setSelectedItem(jTable2.getValueAt(jTable2.getSelectedRow(), 1));
+            jTextField3.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 2).toString());
+            jTextField4.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 3).toString());
+            jTextField5.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 4).toString());
+            jTextField6.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 5).toString());
+            jTextField7.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 6).toString());
+            jTextField8.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 7).toString());
+            jTextField9.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 8).toString());
+        }
+    }//GEN-LAST:event_jTable2MouseClicked
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        if (jTable2.getSelectedRow() != -1) {
+            try {
+                String cod = jTextField1.getText();
+                String status = jComboBox1.getSelectedItem().toString();
+                Date data = formato.parse(jTextField2.getText());
+                String nome = jTextField3.getText();
+                int qtdEstoque = Integer.parseInt(jTextField4.getText());
+                String descricao = jTextArea1.getText();
+                int estoqueMin = Integer.parseInt(jTextField5.getText());
+                int estoqueMax = Integer.parseInt(jTextField6.getText());
+                float precoCompra = Float.parseFloat(jTextField7.getText());
+                float precoVenda = Float.parseFloat(jTextField8.getText());
+                float fator = Float.parseFloat(jTextField9.getText());
+                int NCM = Integer.parseInt(jTextField10.getText());
+                String barCode = jTextField11.getText();
+
+                Product produto = new Product(cod, status.charAt(0), nome, descricao, qtdEstoque, estoqueMin, estoqueMax, precoCompra, precoVenda, barCode, NCM, fator, data, base64Image);
+
+                ProductDAO.alterarProduto(produto);
+
+            } catch (ParseException ex) {
+                Logger.getLogger(ProductForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jTextField5KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField5KeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField5KeyPressed
+
+    private void jTextField8FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField8FocusLost
+        this.calcularFator();
+    }//GEN-LAST:event_jTextField8FocusLost
 
     /**
      * @param args the command line arguments
@@ -477,16 +583,56 @@ public class ProductForm extends javax.swing.JFrame {
                 + "imagens (*.PNG, *.JPG, *.JPEG)",
                 "png", "jpg", "jpeg"));
         int result = jfc.showOpenDialog(this);
+        Image imagem = null;
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
                 fis = new FileInputStream(jfc.getSelectedFile());
                 tamanho = (int) jfc.getSelectedFile().length();
-                Image foto = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(jLabel14.getWidth(), jLabel14.getHeight(), Image.SCALE_SMOOTH);
-                jLabel14.setIcon(new ImageIcon(foto));
+                imagem = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(jLabel14.getWidth(), jLabel14.getHeight(), Image.SCALE_SMOOTH);
+                jLabel14.setIcon(new ImageIcon(imagem));
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
+
+        try {
+            // Conversão da imagem para BufferedImage
+            BufferedImage bufferedImage = convertImageToBufferedImage(imagem);
+
+            // Conversão da imagem para base64
+            base64Image = convertImageToBase64(bufferedImage);
+
+            // Imprimir o resultado
+            System.out.println("Imagem em Base64:\n" + base64Image);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static String convertImageToBase64(BufferedImage bufferedImage) throws IOException {
+        // Cria um fluxo de saída para escrever os bytes da imagem
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        // Escreve a imagem no fluxo de saída no formato PNG (você pode escolher outro formato)
+        ImageIO.write(bufferedImage, "png", byteArrayOutputStream);
+
+        // Converte os bytes para um array de bytes
+        byte[] imageBytes = byteArrayOutputStream.toByteArray();
+
+        // Usa a classe Base64 para converter o array de bytes para uma string Base64
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
+
+    private static BufferedImage convertImageToBufferedImage(Image image) {
+        if (image instanceof BufferedImage) {
+            return (BufferedImage) image;
+        }
+
+        // Cria uma BufferedImage e a desenha
+        BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        bufferedImage.getGraphics().drawImage(image, 0, 0, null);
+        return bufferedImage;
     }
 
     private void carregarTabela() {
@@ -508,12 +654,31 @@ public class ProductForm extends javax.swing.JFrame {
         }
     }
 
+    public void calcularFator() {
+
+        float preco_venda = 0;
+        float preco_compra = 0;
+        float fator_lucro = 0;
+
+        preco_compra = Float.valueOf(jTextField7.getText());
+        preco_venda = Float.valueOf(jTextField8.getText());
+        fator_lucro = ((preco_venda - preco_compra) / preco_compra) * 100;
+
+        DecimalFormat decimalFormat = new DecimalFormat();
+
+        decimalFormat.setMaximumFractionDigits(2);
+        String fatorFormatado = decimalFormat.format(fator_lucro);
+        jTextField9.setText(fatorFormatado);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jButton7;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

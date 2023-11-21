@@ -118,4 +118,20 @@ public class ProductDAO {
         return produtos;
     }
 
+    public static void deletarProduto(String cod) {
+        String sql = "DELETE FROM `loja`.`produto` WHERE cod = ?";
+        ResultSet result = null;
+
+        List<Product> produtos = new ArrayList<>();
+        try (Connection connection = DriverManager
+                .getConnection(SERVIDOR, USUARIO, SENHA); PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, cod);
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
